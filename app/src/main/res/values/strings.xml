@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">NumberLink</string>
+    <string name="title_activity_levels">Levels</string>
+    <string name="boardSize">%dx%d</string>
+</resources>
