@@ -1,4 +1,4 @@
-package com.alienpants.numberlink.libraries;
+package com.alienpants.linker.libraries;
 
 import android.app.Activity;
 import android.graphics.Point;
@@ -8,19 +8,12 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.alienpants.numberlink.application.NumberLink;
-import com.alienpants.numberlink.responsemodels.BaseResponse;
+import com.alienpants.linker.application.NumberLink;
+import com.alienpants.linker.responsemodels.BaseResponse;
 
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 import retrofit2.Call;
 import retrofit2.Callback;

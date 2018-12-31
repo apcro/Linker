@@ -1,6 +1,6 @@
-package com.alienpants.numberlink.libraries;
+package com.alienpants.linker.libraries;
 
-import com.alienpants.numberlink.responsemodels.BaseResponse;
+import com.alienpants.linker.responsemodels.BaseResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Header;

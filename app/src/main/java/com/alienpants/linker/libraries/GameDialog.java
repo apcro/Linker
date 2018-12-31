@@ -1,17 +1,13 @@
-package com.alienpants.numberlink.libraries;
+package com.alienpants.linker.libraries;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
-import com.alienpants.numberlink.R;
-
-import androidx.annotation.NonNull;
+import com.alienpants.linker.R;
 
 /**
  * Android

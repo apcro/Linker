@@ -1,4 +1,4 @@
-package com.alienpants.numberlink.responsemodels;
+package com.alienpants.linker.responsemodels;
 
 import com.google.gson.annotations.SerializedName;
 

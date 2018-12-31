@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -23,10 +24,9 @@
 
         <Button
             android:id="@+id/button_back"
-            android:layout_width="25dp"
-            android:layout_height="40dp"
-            android:background="@drawable/button_direction01"
-            android:scaleX="-1" />
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/back_icon" />
 
         <TextView
             android:id="@+id/levelNumber"
@@ -38,12 +38,8 @@
             android:fontFamily="@font/hvdcomicserifpro"
             android:gravity="center_vertical|clip_vertical|start"
             android:paddingStart="20dp"
-            android:shadowColor="@color/OrangeRed"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="2"
             android:text="Level"
-            android:textColor="@android:color/white"
+            android:textColor="@color/BrandYellow"
             android:textColorHighlight="@android:color/primary_text_dark"
             android:textSize="28sp" />
 
@@ -54,26 +50,21 @@
             android:layout_alignParentTop="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="20dp"
-            android:layout_toLeftOf="@+id/button_exit"
+            android:layout_toLeftOf="@+id/buttonExit"
             android:layout_weight="1"
             android:alpha="0.7"
             android:fontFamily="@font/hvdcomicserifpro"
             android:gravity="center_vertical|center_horizontal"
-            android:shadowColor="@color/OrangeRed"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="2"
             android:text="0x0"
-            android:textColor="@android:color/white"
-            android:textColorHighlight="@android:color/primary_text_dark"
+            android:textColor="@color/BrandYellow"
             android:textSize="24sp" />
 
         <Button
-            android:id="@+id/button_exit"
+            android:id="@+id/buttonExit"
             android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/button_close01" />
+            android:background="@drawable/close_icon" />
 
     </RelativeLayout>
 
@@ -103,12 +94,8 @@
                 android:layout_weight="0.37"
                 android:fontFamily="@font/hvdcomicserifpro"
                 android:paddingStart="20dp"
-                android:shadowColor="@color/OrangeRed"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="2"
                 android:text="Lines: 0"
-                android:textColor="@android:color/white"
+                android:textColor="@color/BrandYellow"
                 android:textSize="16sp" />
 
             <TextView
@@ -118,12 +105,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.37"
                 android:fontFamily="@font/hvdcomicserifpro"
-                android:shadowColor="@color/OrangeRed"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="2"
                 android:text="Moves: 0"
-                android:textColor="@android:color/white"
+                android:textColor="@color/BrandYellow"
                 android:textSize="16sp" />
 
             <TextView
@@ -133,12 +116,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.37"
                 android:fontFamily="@font/hvdcomicserifpro"
-                android:shadowColor="@color/OrangeRed"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="2"
                 android:text="Moves: 0"
-                android:textColor="@android:color/white"
+                android:textColor="@color/BrandYellow"
                 android:textSize="16sp" />
 
         </LinearLayout>
@@ -157,11 +136,56 @@
                 android:id="@+id/table_game"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/cell_shape"
                 android:padding="0dp"
                 android:screenOrientation="portrait"
                 android:shrinkColumns="*"
                 android:stretchColumns="*" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.37"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:screenOrientation="portrait"
+            android:weightSum="1">
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.37"
+                android:paddingStart="5dp"
+                android:paddingLeft="5dp"
+                android:paddingEnd="5dp"
+                android:paddingRight="5dp"
+                app:srcCompat="@drawable/left_icon" />
+
+            <ImageView
+                android:id="@+id/imageView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.37"
+                android:paddingStart="5dp"
+                android:paddingLeft="5dp"
+                android:paddingEnd="5dp"
+                android:paddingRight="5dp"
+                app:srcCompat="@drawable/circle_close_icon" />
+
+            <ImageView
+                android:id="@+id/imageView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.37"
+                android:paddingStart="5dp"
+                android:paddingLeft="5dp"
+                android:paddingEnd="5dp"
+                android:paddingRight="5dp"
+                app:srcCompat="@drawable/right_icon" />
+
         </LinearLayout>
 
     </LinearLayout>
@@ -174,5 +198,5 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/button_replay01" />
+        android:background="@drawable/reset_icon" />
 </RelativeLayout>

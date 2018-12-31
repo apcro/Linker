@@ -1,11 +1,14 @@
-package com.alienpants.numberlink.application;
+package com.alienpants.linker.application;
 
 import android.app.Application;
 import android.content.Context;
 
-import com.alienpants.numberlink.libraries.Backend;
+import com.alienpants.linker.data.MyObjectBox;
+import com.alienpants.linker.libraries.Backend;
 
-public class NumberLink extends Application {
+import io.objectbox.BoxStore;
+
+public class NumberLink extends Application  {
 
     public static final String preferencesFileName = "TakeMeAwayPreferences";
     public static final String MAINFONT = "fonts/Muli-Regular.ttf";
@@ -15,6 +18,8 @@ public class NumberLink extends Application {
     public static final String AVATAR_URI = "https://cdn1.takemeaway.io/images/user/avatars";
 
     private static Backend mBackend;
+
+    private BoxStore boxStore;
 
     @Override
     public void onCreate() {
@@ -28,6 +33,8 @@ public class NumberLink extends Application {
 
         mBackend = new Backend(this);
 
+        boxStore = MyObjectBox.builder().androidContext(NumberLink.this).build();
+
     }
 
     public NumberLink() {
@@ -40,6 +47,10 @@ public class NumberLink extends Application {
 
     public static Context context() {
         return mBackend.getApplication().getApplicationContext();
+    }
+
+    public BoxStore getBoxStore() {
+        return boxStore;
     }
 
 }

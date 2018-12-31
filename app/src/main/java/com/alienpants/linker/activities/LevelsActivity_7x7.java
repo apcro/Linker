@@ -1,4 +1,4 @@
-package com.alienpants.numberlink.activities;
+package com.alienpants.linker.activities;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -6,15 +6,12 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.alienpants.numberlink.R;
-import com.alienpants.numberlink.libraries.Utilities;
+import com.alienpants.linker.R;
+import com.alienpants.linker.libraries.Utilities;
 import com.wefika.flowlayout.FlowLayout;
 
 import java.io.FileInputStream;

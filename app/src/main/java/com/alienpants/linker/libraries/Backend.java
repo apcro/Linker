@@ -1,11 +1,11 @@
-package com.alienpants.numberlink.libraries;
+package com.alienpants.linker.libraries;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
-import com.alienpants.numberlink.application.NumberLink;
+import com.alienpants.linker.application.NumberLink;
 
 import java.security.InvalidKeyException;
 import java.security.Key;

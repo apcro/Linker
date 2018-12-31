@@ -1,8 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape
-  xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape= "rectangle"  >
-        <solid android:color="#FFC8DCEE"/>
-        <stroke android:width="1dp"  android:color="#000"/>
-        <corners android:radius="2dp"/>
-</shape>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <padding android:top="0dp" android:right="0dp" android:bottom="0dp" android:left="0dp" />
+            <stroke android:width="1dp" android:color="#66cf981a"/>
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+            <stroke android:width="1dp" android:color="#44cf981a"/>
+            <corners android:radius="2dp" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <padding android:top="2dp" android:right="2dp" android:bottom="2dp" android:left="2dp" />
+            <stroke android:width="1dp" android:color="#22cf981a"/>
+            <corners android:radius="2dp" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <padding android:top="4dp" android:right="4dp" android:bottom="4dp" android:left="4dp" />
+            <stroke android:width="1dp" android:color="#11cf981a"/>
+            <corners android:radius="2dp" />
+        </shape>
+    </item>
+</layer-list>
+
+
+<!--<shape-->
+  <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:shape= "rectangle"  >-->
+        <!--&lt;!&ndash;<solid android:color="#FFC8DCEE"/>&ndash;&gt;-->
+        <!--<stroke android:width=".5dp" android:color="#cf981a"/>-->
+        <!---->
+<!--</shape>-->

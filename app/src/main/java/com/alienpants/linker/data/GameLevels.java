@@ -1,10 +1,8 @@
-package com.alienpants.numberlink.data;
+package com.alienpants.linker.data;
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 
-import com.alienpants.numberlink.models.Cell;
+import com.alienpants.linker.models.Cell;
 
 /**
  * Android

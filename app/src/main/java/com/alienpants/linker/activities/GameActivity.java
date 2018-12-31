@@ -1,11 +1,10 @@
-package com.alienpants.numberlink.activities;
+package com.alienpants.linker.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -13,12 +12,14 @@ import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.widget.ImageViewCompat;
+import io.objectbox.Box;
 
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -28,16 +29,19 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 
-import com.alienpants.numberlink.application.NumberLink;
-import com.alienpants.numberlink.data.GameLevel;
-import com.alienpants.numberlink.libraries.Backend;
-import com.alienpants.numberlink.libraries.Utilities;
-import com.alienpants.numberlink.models.Cell;
-import com.alienpants.numberlink.R;
+import com.alienpants.linker.application.NumberLink;
+import com.alienpants.linker.data.GameLevel;
+import com.alienpants.linker.data.LevelData;
+import com.alienpants.linker.data.LevelData_;
+import com.alienpants.linker.libraries.Backend;
+import com.alienpants.linker.libraries.Utilities;
+import com.alienpants.linker.models.Cell;
+import com.alienpants.linker.R;
 
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -51,6 +55,9 @@ public class GameActivity extends Activity {
     int mCellWidth, mCellHeight;
 
     Backend mBackend;
+    Box mLevelsBox;
+
+    LevelData mThisLevel;
 
     private static final long MIN_DELAY_MS = 100;
     private long mLastClickTime;
@@ -61,11 +68,9 @@ public class GameActivity extends Activity {
     int size = 7;
     int level = 1;
     int levelCount = 12;
-    Cell[][] mTableCellsArray, ArrayCellTwo; // Table that contains the cells of the game
+    Cell[][] mTableCellsArray; // Table that contains the cells of the game
     ArrayList<Cell> mCellsUsed = new ArrayList<>();
-    int mGameScore = 0;
-    int mMoveScore = 0;
-    int mBestScore = 0;
+    int mGameScore, mMoveScore, mBestScore = 0;
     boolean active_draw = false;
     int mColourChosen;
     int IndexPreviousCellRow = 0;
@@ -73,10 +78,10 @@ public class GameActivity extends Activity {
     int IndexCurrentCellRow = 0;
     int IndexCurrentCellCol = 0;
     int mCurrentTouchedRow, mCurrentTouchedCol;
-    Cell previous_cell;
-    Cell current_cell;
-    boolean over = false; // Partie perdue
-    AlertDialog.Builder alert;
+    Cell mPreviousCell;
+    Cell mCurrentCell;
+    private boolean over = false;
+//    AlertDialog.Builder alert;
     AlertDialog.Builder mExitAlert;
     AlertDialog.Builder mGameOverAlert;
     Dialog mWinAlert;
@@ -85,7 +90,7 @@ public class GameActivity extends Activity {
 
     Context mContext;
 
-    private ImageView mTouch;
+    private ImageView mTouchCircle;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -99,19 +104,24 @@ public class GameActivity extends Activity {
         mContext = this;
 
         mBackend = NumberLink.getBackend();
+        mLevelsBox = ((NumberLink) getApplication()).getBoxStore().boxFor(LevelData.class);
 
-
-        Bundle sizeRecu = getIntent().getExtras();
-        if (sizeRecu != null) {
-            size = sizeRecu.getInt("size");
-        }
-        Bundle levelRecu = getIntent().getExtras();
-        level = levelRecu.getInt("level");
+        size = this.getIntent().getExtras().getInt("size");
+        level = this.getIntent().getExtras().getInt("level");
 
         // get scores, and set them if needed
-        String scores = getSetScores(size, level);
-        String[] scores_moves = scores.split(";");
-        mBestScore = Integer.parseInt(scores_moves[1]);
+        List<LevelData> levels = mLevelsBox.query()
+                .equal(LevelData_.size, size)
+                .and()
+                .equal(LevelData_.num, level)
+                .build().find();
+
+        mThisLevel = levels.get(0);
+        mBestScore = mThisLevel.getBestScore();
+
+//        String scores = getSetScores(size, level);
+//        String[] scores_moves = scores.split(";");
+//        mBestScore = Integer.parseInt(scores_moves[1]);
 
         mGameTable = findViewById(R.id.table_game);
         mTableHolder = findViewById(R.id.tableHolder);
@@ -122,21 +132,30 @@ public class GameActivity extends Activity {
         mCellHeight = 0;
 
         // Fill the table according to the level and the size passed in parameters
-        InitialiseNewTabelCellsArray(size, level);
+        InitialiseNewTableCellsArray(size, level);
         BuildTable(size);
 
         // Show victory message
         mWinAlert = new Dialog(GameActivity.this);
         mWinAlert.setContentView(R.layout.dialog_success);
 
+        Typeface typeface = ResourcesCompat.getFont(this, R.font.snowdream);
+
+        TextView successTextNextLevel = findViewById(R.id.successTextNextLevel);
+        successTextNextLevel.setTypeface(typeface);
+
         Button yes = mWinAlert.findViewById(R.id.btn_yes);
-        Button no = mWinAlert.findViewById(R.id.btn_no);
+        yes.setTypeface(typeface);
+
         yes.setOnClickListener(view -> {
             saveData();
             goNextLevel();
             mWinAlert.dismiss();
             Utilities.hideUI(this);
         });
+
+        Button no = mWinAlert.findViewById(R.id.btn_no);
+        no.setTypeface(typeface);
         no.setOnClickListener(view -> {
             resetGame();
             saveData();
@@ -148,17 +167,8 @@ public class GameActivity extends Activity {
         mExitAlert = new AlertDialog.Builder(mContext);
         mExitAlert.setTitle("Exit Game");
         mExitAlert.setMessage("Do you want to leave the game");
-        mExitAlert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                finish();   // Exit the application and return to the window to choose new
-                            // levels
-            }
-        });
-        mExitAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-//                return; // Do nothing and continue to play
-            }
-        });
+        mExitAlert.setPositiveButton("Yes", (dialog, id) -> finish());
+        mExitAlert.setNegativeButton("Cancel", (dialog, id) -> {});
 
         // Show message for lost party
 
@@ -175,13 +185,13 @@ public class GameActivity extends Activity {
         Button buttonBack = findViewById(R.id.button_back);
         buttonBack.setOnClickListener(v -> onBackPressed());
 
-        Button buttonExit = findViewById(R.id.button_exit);
+        Button buttonExit = findViewById(R.id.buttonExit);
         buttonExit.setOnClickListener(v -> mExitAlert.show());
 
-        mTouch = findViewById(R.id.touchCircle);
-        mTouch.setX(-100);
-        mTouch.setY(-100);
-        mTouch.setVisibility(View.GONE);
+        mTouchCircle = findViewById(R.id.touchCircle);
+        mTouchCircle.setX(-100);
+        mTouchCircle.setY(-100);
+        mTouchCircle.setVisibility(View.GONE);
 
         setMoves();
         setScore();
@@ -219,8 +229,8 @@ public class GameActivity extends Activity {
                     if (!isConnected(mTableCellsArray[IndexRow][IndexCol])) {
                         mTableCellsArray[IndexRow][IndexCol].setType(Cell.CellType.First);
                         addCellUsed(mTableCellsArray[IndexRow][IndexCol], true);
-                        previous_cell = mCellsUsed.get(mCellsUsed.size() - 1);
-                        current_cell = mCellsUsed.get(mCellsUsed.size() - 1);
+                        mPreviousCell = mCellsUsed.get(mCellsUsed.size() - 1);
+                        mCurrentCell = mCellsUsed.get(mCellsUsed.size() - 1);
                     }
                 }
 
@@ -229,9 +239,9 @@ public class GameActivity extends Activity {
 
 
                 // hide touch circle
-                mTouch.setX(-100);
-                mTouch.setY(-100);
-                mTouch.setVisibility(View.GONE);
+                mTouchCircle.setX(-100);
+                mTouchCircle.setY(-100);
+                mTouchCircle.setVisibility(View.GONE);
 
                 mMoveScore++;
                 setMoves();
@@ -263,6 +273,7 @@ public class GameActivity extends Activity {
                         mGameOverAlert.show();
                     }
                     Objects.requireNonNull(mWinAlert.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
+                    mWinAlert.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     mWinAlert.show();
                 }
 
@@ -281,26 +292,24 @@ public class GameActivity extends Activity {
             if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
 
                 // show touch circle
-                mTouch.setX(event.getRawX() - 96 - 24);
-                mTouch.setY(event.getRawY() - 96 - 24);
-
-                ImageViewCompat.setImageTintList(mTouch, ColorStateList.valueOf(mColourChosen));
-
-                mTouch.setVisibility(View.VISIBLE);
+                mTouchCircle.setX(event.getRawX() - 96 - 24);
+                mTouchCircle.setY(event.getRawY() - 96 - 24);
+                ImageViewCompat.setImageTintList(mTouchCircle, ColorStateList.valueOf(mColourChosen));
+                mTouchCircle.setVisibility(View.VISIBLE);
 
                 if (mCellsUsed.size() > 0 && (mTableCellsArray[IndexRow][IndexCol].getColor() == Color.TRANSPARENT || mTableCellsArray[IndexRow][IndexCol].isUsed())) {
                     if (!addCellUsed(mTableCellsArray[IndexRow][IndexCol], false)) {
                         active_draw = false;
                     }
                 }
-                if (mCellsUsed.size() > 1) {
-                    previous_cell = mCellsUsed.get(mCellsUsed.size() - 2);
-                    current_cell = mCellsUsed.get(mCellsUsed.size() - 1);
-                    IndexPreviousCellRow = previous_cell.getIndexRow();
-                    IndexPreviousCellCol = previous_cell.getIndexCol();
-                    IndexCurrentCellRow = current_cell.getIndexRow();
-                    IndexCurrentCellCol = current_cell.getIndexCol();
 
+                if (mCellsUsed.size() > 1) {
+                    mPreviousCell = mCellsUsed.get(mCellsUsed.size() - 2);
+                    mCurrentCell = mCellsUsed.get(mCellsUsed.size() - 1);
+                    IndexPreviousCellRow = mPreviousCell.getIndexRow();
+                    IndexPreviousCellCol = mPreviousCell.getIndexCol();
+                    IndexCurrentCellRow = mCurrentCell.getIndexRow();
+                    IndexCurrentCellCol = mCurrentCell.getIndexCol();
                 }
 
                 // Draw lines between circles
@@ -332,60 +341,19 @@ public class GameActivity extends Activity {
 //        }
     }
     private void saveData() {
-
-        String scores = mBackend.getSharedPreferences(size+"x"+size);
-        if (scores == null) {
-            scores = "";
-            for (int i = 0; i < levelCount; i++) {
-                scores = scores + ".;.:";
-            }
+        int best = mThisLevel.getBestScore();
+        if (mMoveScore == mGameScore) {
+            mThisLevel.setScore(3);
+        } else if (mMoveScore < (mGameScore + 3)) {
+            mThisLevel.setScore(2);
+        } else {
+            mThisLevel.setScore(1);
         }
-        String[] separated = scores.split(":");
-        separated[(level-1)] = String.valueOf(mGameScore)+";"+String.valueOf(mMoveScore);
-
-        String result = TextUtils.join(":", separated);
-
-        mBackend.setSharedPreferences(size+"x"+size, result);
-
-
-//        try {
-//            fileOutputStream = openFileOutput("dataLevelSize.txt", Context.MODE_PRIVATE);
-//            osw = new OutputStreamWriter(fileOutputStream);
-//            try {
-//                osw.write(size + ";" + level);
-//                osw.flush();
-//                osw.close();
-//                Toast.makeText(getBaseContext(), "Level saved", Toast.LENGTH_LONG).show();
-//                int data_block = 100;
-//                try {
-//                    FileInputStream fis = openFileInput("dataLevelSize.txt");
-//                    InputStreamReader isr = new InputStreamReader(fis);
-//                    char[] dataChar = new char[data_block];
-//                    String final_data = "";
-//                    int size1;
-//                    try {
-//                        while((size1 = isr.read(dataChar))>0) {
-//                            String read_data = String.copyValueOf(dataChar, 0, size1);
-//                            final_data+=read_data;
-//                            dataChar = new char[data_block];
-//
-//                        }
-//                        //Toast.makeText(getBaseContext(),"Contenu: " + final_data, Toast.LENGTH_LONG).show();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-
+        if (mMoveScore < best) {
+            mThisLevel.setBestScore(mMoveScore);
+        }
+        mThisLevel.setLocked(false);
+        mLevelsBox.put(mThisLevel);
 
     }
 
@@ -410,9 +378,6 @@ public class GameActivity extends Activity {
         for (int row = 0; row < size; ++row) {
             for (int col = 0; col < size; ++col) {
                 // any empty slots, not finished
-//                if (!mTableCellsArray[row][col].isUsed()) {
-//                    success = false;
-//                }
                 if (mTableCellsArray[row][col].getColor() == Color.TRANSPARENT) {
                     success = false;
                 }
@@ -692,22 +657,29 @@ public class GameActivity extends Activity {
             Log.d(TAG, "DrawLine Cell entry draw");
             // entry?
             if (IndexPreviousCellRow > IndexCurrentCellRow && IndexPreviousCellCol == IndexCurrentCellCol) {
+                Log.d(TAG, "1");
                 _drawLine(IndexPreviousCellRow, IndexPreviousCellCol, mColourChosen, active_draw, Cell.CellShape.DownHalf);
-            }
+            } else
 
             // From Up to Down
             if (IndexPreviousCellRow < IndexCurrentCellRow && IndexPreviousCellCol == IndexCurrentCellCol) {
+                Log.d(TAG, "2");
                 _drawLine(IndexPreviousCellRow, IndexPreviousCellCol, mColourChosen, active_draw, Cell.CellShape.UpHalf);
-            }
+            } else
 
             // From Right to Left
             if (IndexPreviousCellRow == IndexCurrentCellRow && IndexPreviousCellCol > IndexCurrentCellCol) {
+                Log.d(TAG, "3");
                 _drawLine(IndexPreviousCellRow, IndexPreviousCellCol, mColourChosen, active_draw, Cell.CellShape.RightHalf);
-            }
+            } else
 
             // From Left to Right
             if (IndexPreviousCellRow == IndexCurrentCellRow && IndexPreviousCellCol < IndexCurrentCellCol) {
+                Log.d(TAG, "4");
                 _drawLine(IndexPreviousCellRow, IndexPreviousCellCol, mColourChosen, active_draw, Cell.CellShape.LeftHalf);
+            } else {
+                Log.d(TAG, "No conditions met");
+                Log.d(TAG, IndexPreviousCellRow + ":" + IndexCurrentCellRow + ":" + IndexPreviousCellCol + ":" + IndexCurrentCellCol + ":" + active_draw);
             }
 
         }
@@ -746,11 +718,20 @@ public class GameActivity extends Activity {
                     mTableCellsArray[IndexRow][IndexCol].setCellShape(cellShape);
                     mTableCellsArray[IndexRow][IndexCol].setColor(color_chosen);
                     BuildTable(size);
+//                } else if (cellShape == Cell.CellShape.Circle && (IndexCol != 0 && IndexCol != size - 1)) {
+//                    mTableCellsArray[IndexRow][IndexCol].setCellShape(cellShape);
+//                    mTableCellsArray[IndexRow][IndexCol].setColor(color_chosen);
+//                    BuildTable(size);
+//                    Log.d(TAG, "draw here, but need proper constraints");
                 }
             } else if (isSecondCircle(IndexRow, IndexCol)) {
                 redesignSecondCircle(IndexRow, IndexCol);
+            } else {
+                Log.d(TAG, "draw here?");
             }
 
+        } else {
+            Log.d(TAG, "not active_draw");
         }
     }
 
@@ -811,7 +792,7 @@ public class GameActivity extends Activity {
         for (int i = 0; i < size; i++) {
 
             TableRow row = new TableRow(mContext);
-            row.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            row.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
             for (int col = 0; col < size; col++) {
                 row.addView(mTableCellsArray[i][col]);
             }
@@ -868,7 +849,13 @@ public class GameActivity extends Activity {
                 ++level;
             }
         }
-        InitialiseNewTabelCellsArray(size, level);
+        // update level locks
+        List<LevelData> levels = mLevelsBox.query().equal(LevelData_.size, size).and().equal(LevelData_.num, level).build().find();
+        LevelData thislevel = levels.get(0);
+        thislevel.unlock();
+        mLevelsBox.put(thislevel);
+
+        InitialiseNewTableCellsArray(size, level);
 
         // build new table
         // BuildTable is used to redraw the table constantly
@@ -878,12 +865,13 @@ public class GameActivity extends Activity {
                 .setDuration(500)
                 .translationX(-750)
                 .withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                BuildTable(size);
-                mGameTable.setX(750);
-                mGameTable.animate().alpha(1).translationX(0).setDuration(500);
-            }
+                    @Override
+                    public void run() {
+                        BuildTable(size);
+                        setMeasurements();
+                        mGameTable.setX(750);
+                        mGameTable.animate().alpha(1).translationX(0).setDuration(500);
+                    }
         });
 
         mGameScore = 0;
@@ -894,7 +882,7 @@ public class GameActivity extends Activity {
 
     // Initialize the game
     private void resetGame() {
-        InitialiseNewTabelCellsArray(size, level);
+        InitialiseNewTableCellsArray(size, level);
         BuildTable(size);
         mGameScore = 0;
         mMoveScore = 0;
@@ -909,218 +897,233 @@ public class GameActivity extends Activity {
 
     // use Utilities.mockDataReader(filename) to load a JSON file into a string
     // see https://stackoverflow.com/questions/48936485/json-parser-in-android-using-local-json-file
-    private void InitialiseNewTabelCellsArray(int size, int level) {
+    private void InitialiseNewTableCellsArray(int size, int levelNumber) {
 
         mTableCellsArray = new Cell[size][size];
 
-        if (size == 5) {
-            GameLevel gameLevel = new GameLevel(getApplicationContext(), "Level " + String.valueOf(level), level, size);
+        List<LevelData> levels = mLevelsBox.query().equal(LevelData_.size, size).and().equal(LevelData_.num, levelNumber).build().find();
 
-            switch (level) {
-                case 1:
-                    gameLevel.makeLayout("01..2.1.3......4.5..40523");
-                    break;
-                case 2:
-                    gameLevel.makeLayout("0...20.3.21.......4.34..1");
-                    break;
-                case 3:
-                    gameLevel.makeLayout("012340..34......567.15672");
-                    break;
-                case 4:
-                    gameLevel.makeLayout("0..12330.2....1.5..44...5");
-                    break;
-                case 5:
-                    gameLevel.makeLayout("01221......30.....3......");
-                    break;
-                case 6:
-                    gameLevel.makeLayout("...11.2..0.2..3...44035.5");
-                    break;
-                case 7:
-                    gameLevel.makeLayout("0..1234...34...0....1...2");
-                    break;
-                case 8:
-                    gameLevel.makeLayout("0..123.0..4....4..5.3.152");
-                    break;
-                case 9:
-                    gameLevel.makeLayout("0....1..1....2..033.2....");
-                    break;
-                case 10:
-                    gameLevel.makeLayout("0..011....2.3.43.2......4");
-                    break;
-                case 11:
-                    gameLevel.makeLayout("01..20...31...42....3...4");
-                    break;
-                case 12:
-                    gameLevel.makeLayout("0...20.3....3...2.1..1...");
-                    break;
-            }
-            mTableCellsArray = gameLevel.getGameLayout();
-        }
+//        List<LevelData> levels = LevelData.find(LevelData.class, "size = ? and level = ?", String.valueOf(size), String.valueOf(levelNumber));
 
-        if (size == 6) {
-            GameLevel gameLevel = new GameLevel(getApplicationContext(), "Level " + String.valueOf(level), level, size);
+        LevelData level = levels.get(0);
+//        for (LevelData iterlevel : levels) {
+//            if (iterlevel.getNum() == levelNumber) {
+//                level = iterlevel;
+//            }
+//        }
 
-            switch (level) {
-                case 1:
-                    gameLevel.makeLayout("....12.33.12.44.......50......056776");
-                    break;
-                case 2:
-                    gameLevel.makeLayout("0....122..0.33..4.5..1..6..4..65....");
-                    break;
-                case 3:
-                    gameLevel.makeLayout("012345.12.4...3.5.6.7..76.8..80.9..9");
-                    break;
-                case 4:
-                    gameLevel.makeLayout("0012341..23.556.......78.....86499.7");
-                    break;
-                case 5:
-                    gameLevel.makeLayout("012..30..3441....25....56....67....7");
-                    break;
-                case 6:
-                    gameLevel.makeLayout("01..2.......3.....0.4....34..2.....1");
-                    break;
-                case 7:
-                    gameLevel.makeLayout("..0123.1..2.....3.445.6.5.....7..706");
-                    break;
-                case 8:
-                    gameLevel.makeLayout("0....011....2..3...4.5...6.23.465...");
-                    break;
-                case 9:
-                    gameLevel.makeLayout("01....0...3.1..........3.45.2.245...");
-                    break;
-                case 10:
-                    gameLevel.makeLayout("012340...34....2....55.6..1.......6.");
-                    break;
-                case 11:
-                    gameLevel.makeLayout("0...220.3.4.1......5.3...166..5....4");
-                    break;
-                case 12:
-                    gameLevel.makeLayout("01....01.3.2...4.3.5...4.2.6775....6");
-                    break;
-            }
-            mTableCellsArray = gameLevel.getGameLayout();
-        }
+        GameLevel gameLevel = new GameLevel(getApplicationContext(), "Level " + String.valueOf(level.getNum()), levelNumber, size);
+        gameLevel.makeLayout(level.getLayout());
+        mTableCellsArray = gameLevel.getGameLayout();
 
-
-        if (size == 7) {
-            GameLevel gameLevel = new GameLevel(getApplicationContext(), "Level " + String.valueOf(level), level, size);
-
-            switch (level) {
-                case 1:
-                    gameLevel.makeLayout("0123..40...45.1......2..6...........78.6..378...5");
-                    break;
-                case 2:
-                    gameLevel.makeLayout("0..0123.45........2....1.3..........5.667....7..4");
-                    break;
-                case 3:
-                    gameLevel.makeLayout("0...2330.4.........5..6.415......2....7..6881...7");
-                    break;
-                case 4:
-                    gameLevel.makeLayout(".......1........2........2....3.4..54..35.1......");
-                    break;
-                case 5:
-                    gameLevel.makeLayout("........6...7...7..43......1.....521364........52");
-                    break;
-                case 6:
-                    gameLevel.makeLayout("...............63.3...5........156.14.24........2");
-                    break;
-                case 7:
-                    gameLevel.makeLayout("...1234.50.....56........2...60.......1.7.3....74");
-                    break;
-                case 8:
-                    gameLevel.makeLayout("0.1...34.1.5.34.2.5.......6..7.0....76..88......2");
-                    break;
-                case 9:
-                    gameLevel.makeLayout("0......220.33.1...44.5..51..6..6...88...9.7..9..7");
-                    break;
-                case 10:
-                    gameLevel.makeLayout("...11.2.3..0.4...5....53..6.......4......6027...7");
-                    break;
-                case 11:
-                    gameLevel.makeLayout("0..110.22.334.55.4...6......7.....87..9..96.....8");
-                    break;
-                case 12:
-                    gameLevel.makeLayout("0....012.......3..445.6..........77......5362...1");
-                    break;
-            }
-            mTableCellsArray = gameLevel.getGameLayout();
-        }
-
-        if (size == 8) {
-            for (int row = 0; row < size; row++) {
-                for (int col = 0; col < size; col++) {
-
-                    // Level 1
-                    if (level == 1) {
-                        if ((row == 1 && col == 5) || (row == 1 && col == 7)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.RoyalBlue), row, col, true);
-                        } else if ((row == 0 && col == 4) || (row == 5 && col == 4)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Red), row, col, true);
-                        } else if ((row == 3 && col == 0) || (row == 3 && col == 6)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Yellow), row, col, true);
-                        } else if ((row == 4 && col == 3) || (row == 5 && col == 2)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Orange), row, col, true);
-                        } else if ((row == 1 && col == 0) || (row == 2 && col == 2)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.LimeGreen), row, col, true);
-                        } else if ((row == 0 && col == 0) || (row == 2 && col == 0)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Maroon), row, col, true);
-                        } else if ((row == 2 && col == 7) || (row == 7 && col == 7)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.PaleTurquoise), row, col, true);
-                        } else if ((row == 1 && col == 6) || (row == 2 && col == 5)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Gray), row, col, true);
-                        } else if ((row == 3 && col == 5) || (row == 4 && col == 2)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.PaleGreen), row, col, true);
-                        } else {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, Color.TRANSPARENT, row, col, false);
-                        }
-                    }
-                    // Level 2
-                    if (level == 2) {
-                        if ((row == 6 && col == 2) || (row == 5 && col == 5)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.RoyalBlue), row, col, true);
-                        } else if ((row == 6 && col == 1) || (row == 4 && col == 3)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Red), row, col, true);
-                        } else if ((row == 0 && col == 5) || (row == 3 && col == 5)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Yellow), row, col, true);
-                        } else if ((row == 1 && col == 4) || (row == 6 && col == 3)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Orange), row, col, true);
-                        } else if ((row == 1 && col == 6) || (row == 3 && col == 6)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.LimeGreen), row, col, true);
-                        } else if ((row == 0 && col == 4) || (row == 0 && col == 6)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.PaleTurquoise), row, col, true);
-                        } else if ((row == 2 && col == 2) || (row == 4 && col == 2)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType
-                                    .None, ContextCompat.getColor(this, R.color.PaleGreen), row, col, true);
-                        } else {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, Color.TRANSPARENT, row, col, false);
-                        }
-                    }
-                    // Level 3
-                    if (level == 3) {
-                        if ((row == 1 && col == 1) || (row == 6 && col == 2)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.RoyalBlue), row, col, true);
-                        } else if ((row == 5 && col == 2) || (row == 4 && col == 4)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Red), row, col, true);
-                        } else if ((row == 1 && col == 5) || (row == 5 && col == 3)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Yellow), row, col, true);
-                        } else if ((row == 1 && col == 3) || (row == 3 && col == 4)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Orange), row, col, true);
-                        } else if ((row == 3 && col == 0) || (row == 0 && col == 3)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.LimeGreen), row, col, true);
-                        } else if ((row == 1 && col == 2) || (row == 3 && col == 3)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Maroon), row, col, true);
-                        } else if ((row == 4 && col == 0) || (row == 1 && col == 4)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.PaleTurquoise), row, col, true);
-                        } else if ((row == 2 && col == 5) || (row == 5 && col == 4)) {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.PaleGreen), row, col, true);
-                        } else {
-                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, Color.TRANSPARENT, row, col, false);
-                        }
-                    }
-                }
-            }
-
-        }
+//        if (size == 5) {
+//            gameLevel = new GameLevel(getApplicationContext(), "Level " + String.valueOf(levelNumber), levelNumber, size);
+//
+//            switch (levelNumber) {
+//                case 1:
+//                    gameLevel.makeLayout("01..2.1.3......4.5..40523");
+//                    break;
+//                case 2:
+//                    gameLevel.makeLayout("0...20.3.21.......4.34..1");
+//                    break;
+//                case 3:
+//                    gameLevel.makeLayout("012340..34......567.15672");
+//                    break;
+//                case 4:
+//                    gameLevel.makeLayout("0..12330.2....1.5..44...5");
+//                    break;
+//                case 5:
+//                    gameLevel.makeLayout("01221......30.....3......");
+//                    break;
+//                case 6:
+//                    gameLevel.makeLayout("...11.2..0.2..3...44035.5");
+//                    break;
+//                case 7:
+//                    gameLevel.makeLayout("0..1234...34...0....1...2");
+//                    break;
+//                case 8:
+//                    gameLevel.makeLayout("0..123.0..4....4..5.3.152");
+//                    break;
+//                case 9:
+//                    gameLevel.makeLayout("0....1..1....2..033.2....");
+//                    break;
+//                case 10:
+//                    gameLevel.makeLayout("0..011....2.3.43.2......4");
+//                    break;
+//                case 11:
+//                    gameLevel.makeLayout("01..20...31...42....3...4");
+//                    break;
+//                case 12:
+//                    gameLevel.makeLayout("0...20.3....3...2.1..1...");
+//                    break;
+//            }
+//            mTableCellsArray = gameLevel.getGameLayout();
+//        }
+//
+//        if (size == 6) {
+//            gameLevel = new GameLevel(getApplicationContext(), "Level " + String.valueOf(levelNumber), levelNumber, size);
+//
+//            switch (levelNumber) {
+//                case 1:
+//                    gameLevel.makeLayout("....12.33.12.44.......50......056776");
+//                    break;
+//                case 2:
+//                    gameLevel.makeLayout("0....122..0.33..4.5..1..6..4..65....");
+//                    break;
+//                case 3:
+//                    gameLevel.makeLayout("012345.12.4...3.5.6.7..76.8..80.9..9");
+//                    break;
+//                case 4:
+//                    gameLevel.makeLayout("0012341..23.556.......78.....86499.7");
+//                    break;
+//                case 5:
+//                    gameLevel.makeLayout("012..30..3441....25....56....67....7");
+//                    break;
+//                case 6:
+//                    gameLevel.makeLayout("01..2.......3.....0.4....34..2.....1");
+//                    break;
+//                case 7:
+//                    gameLevel.makeLayout("..0123.1..2.....3.445.6.5.....7..706");
+//                    break;
+//                case 8:
+//                    gameLevel.makeLayout("0....011....2..3...4.5...6.23.465...");
+//                    break;
+//                case 9:
+//                    gameLevel.makeLayout("01....0...3.1..........3.45.2.245...");
+//                    break;
+//                case 10:
+//                    gameLevel.makeLayout("012340...34....2....55.6..1.......6.");
+//                    break;
+//                case 11:
+//                    gameLevel.makeLayout("0...220.3.4.1......5.3...166..5....4");
+//                    break;
+//                case 12:
+//                    gameLevel.makeLayout("01....01.3.2...4.3.5...4.2.6775....6");
+//                    break;
+//            }
+//            mTableCellsArray = gameLevel.getGameLayout();
+//        }
+//
+//
+//        if (size == 7) {
+//            gameLevel = new GameLevel(getApplicationContext(), "Level " + String.valueOf(levelNumber), levelNumber, size);
+//
+//            switch (levelNumber) {
+//                case 1:
+//                    gameLevel.makeLayout("0123..40...45.1......2..6...........78.6..378...5");
+//                    break;
+//                case 2:
+//                    gameLevel.makeLayout("0..0123.45........2....1.3..........5.667....7..4");
+//                    break;
+//                case 3:
+//                    gameLevel.makeLayout("0...2330.4.........5..6.415......2....7..6881...7");
+//                    break;
+//                case 4:
+//                    gameLevel.makeLayout(".......1........2........2....3.4..54..35.1......");
+//                    break;
+//                case 5:
+//                    gameLevel.makeLayout("........6...7...7..43......1.....521364........52");
+//                    break;
+//                case 6:
+//                    gameLevel.makeLayout("...............63.3...5........156.14.24........2");
+//                    break;
+//                case 7:
+//                    gameLevel.makeLayout("...1234.50.....56........2...60.......1.7.3....74");
+//                    break;
+//                case 8:
+//                    gameLevel.makeLayout("0.1...34.1.5.34.2.5.......6..7.0....76..88......2");
+//                    break;
+//                case 9:
+//                    gameLevel.makeLayout("0......220.33.1...44.5..51..6..6...88...9.7..9..7");
+//                    break;
+//                case 10:
+//                    gameLevel.makeLayout("...11.2.3..0.4...5....53..6.......4......6027...7");
+//                    break;
+//                case 11:
+//                    gameLevel.makeLayout("0..110.22.334.55.4...6......7.....87..9..96.....8");
+//                    break;
+//                case 12:
+//                    gameLevel.makeLayout("0....012.......3..445.6..........77......5362...1");
+//                    break;
+//            }
+//            mTableCellsArray = gameLevel.getGameLayout();
+//        }
+//
+//        if (size == 8) {
+//            for (int row = 0; row < size; row++) {
+//                for (int col = 0; col < size; col++) {
+//
+//                    // Level 1
+//                    if (levelNumber == 1) {
+//                        if ((row == 1 && col == 5) || (row == 1 && col == 7)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.RoyalBlue), row, col, true);
+//                        } else if ((row == 0 && col == 4) || (row == 5 && col == 4)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Red), row, col, true);
+//                        } else if ((row == 3 && col == 0) || (row == 3 && col == 6)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Yellow), row, col, true);
+//                        } else if ((row == 4 && col == 3) || (row == 5 && col == 2)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Orange), row, col, true);
+//                        } else if ((row == 1 && col == 0) || (row == 2 && col == 2)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.LimeGreen), row, col, true);
+//                        } else if ((row == 0 && col == 0) || (row == 2 && col == 0)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Maroon), row, col, true);
+//                        } else if ((row == 2 && col == 7) || (row == 7 && col == 7)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.PaleTurquoise), row, col, true);
+//                        } else if ((row == 1 && col == 6) || (row == 2 && col == 5)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Gray), row, col, true);
+//                        } else if ((row == 3 && col == 5) || (row == 4 && col == 2)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.PaleGreen), row, col, true);
+//                        } else {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, Color.TRANSPARENT, row, col, false);
+//                        }
+//                    }
+//                    // Level 2
+//                    if (levelNumber == 2) {
+//                        if ((row == 6 && col == 2) || (row == 5 && col == 5)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.RoyalBlue), row, col, true);
+//                        } else if ((row == 6 && col == 1) || (row == 4 && col == 3)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Red), row, col, true);
+//                        } else if ((row == 0 && col == 5) || (row == 3 && col == 5)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Yellow), row, col, true);
+//                        } else if ((row == 1 && col == 4) || (row == 6 && col == 3)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Orange), row, col, true);
+//                        } else if ((row == 1 && col == 6) || (row == 3 && col == 6)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.LimeGreen), row, col, true);
+//                        } else if ((row == 0 && col == 4) || (row == 0 && col == 6)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.PaleTurquoise), row, col, true);
+//                        } else if ((row == 2 && col == 2) || (row == 4 && col == 2)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType
+//                                    .None, ContextCompat.getColor(this, R.color.PaleGreen), row, col, true);
+//                        } else {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, Color.TRANSPARENT, row, col, false);
+//                        }
+//                    }
+//                    // Level 3
+//                    if (levelNumber == 3) {
+//                        if ((row == 1 && col == 1) || (row == 6 && col == 2)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.RoyalBlue), row, col, true);
+//                        } else if ((row == 5 && col == 2) || (row == 4 && col == 4)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Red), row, col, true);
+//                        } else if ((row == 1 && col == 5) || (row == 5 && col == 3)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Yellow), row, col, true);
+//                        } else if ((row == 1 && col == 3) || (row == 3 && col == 4)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Orange), row, col, true);
+//                        } else if ((row == 3 && col == 0) || (row == 0 && col == 3)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.LimeGreen), row, col, true);
+//                        } else if ((row == 1 && col == 2) || (row == 3 && col == 3)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.Maroon), row, col, true);
+//                        } else if ((row == 4 && col == 0) || (row == 1 && col == 4)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.PaleTurquoise), row, col, true);
+//                        } else if ((row == 2 && col == 5) || (row == 5 && col == 4)) {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(this, R.color.PaleGreen), row, col, true);
+//                        } else {
+//                            mTableCellsArray[row][col] = new Cell(this, Cell.CellShape.Circle, Cell.CellType.None, Color.TRANSPARENT, row, col, false);
+//                        }
+//                    }
+//                }
+//            }
+//
+//        }
     }
 
     private void applyTilt(float x, float y) {

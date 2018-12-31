@@ -1,12 +1,12 @@
-package com.alienpants.numberlink.activities;
+package com.alienpants.linker.activities;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
-import com.alienpants.numberlink.libraries.Utilities;
-import com.alienpants.numberlink.R;
+import com.alienpants.linker.libraries.Utilities;
+import com.alienpants.linker.R;
 
 public class SplashScreen extends Activity {
 

@@ -1,4 +1,4 @@
-package com.alienpants.numberlink.activities;
+package com.alienpants.linker.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import com.alienpants.numberlink.R;
-import com.alienpants.numberlink.libraries.Utilities;
+import com.alienpants.linker.R;
+import com.alienpants.linker.libraries.Utilities;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

@@ -1,10 +1,10 @@
-package com.alienpants.numberlink.data;
+package com.alienpants.linker.data;
 
 import android.content.Context;
 import android.graphics.Color;
 
-import com.alienpants.numberlink.R;
-import com.alienpants.numberlink.models.Cell;
+import com.alienpants.linker.R;
+import com.alienpants.linker.models.Cell;
 
 import androidx.core.content.ContextCompat;
 
