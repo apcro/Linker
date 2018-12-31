@@ -15,8 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alienpants.linker.R;
-import com.alienpants.linker.application.NumberLink;
-import com.alienpants.linker.data.GameLevels;
+import com.alienpants.linker.application.Linker;
 import com.alienpants.linker.data.LevelData;
 import com.alienpants.linker.data.LevelData_;
 import com.alienpants.linker.libraries.Backend;
@@ -38,7 +37,7 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
     Context mContext;
     Box mLevelsBox;
 
-    public Integer[] levelSizes = {5,6,7};
+    public Integer[] levelSizes = {5,6,7,8,9};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +45,9 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_levels);
         Utilities.hideUI(this);
 
-        mBackend = NumberLink.getBackend();
+        mBackend = Linker.getBackend();
         mContext = this;
-        mLevelsBox = ((NumberLink) getApplication()).getBoxStore().boxFor(LevelData.class);
+        mLevelsBox = ((Linker) getApplication()).getBoxStore().boxFor(LevelData.class);
 
         TextView labelView;
 
@@ -139,8 +138,8 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view) {
         Intent intent = new Intent(mContext, GameActivity.class);
-        intent.putExtra("size", Integer.valueOf(String.valueOf(view.getTag())));
-        intent.putExtra("level", Integer.valueOf(String.valueOf(view.getId())));
+        intent.putExtra("mTableSize", Integer.valueOf(String.valueOf(view.getTag())));
+        intent.putExtra("mCurrentLevel", Integer.valueOf(String.valueOf(view.getId())));
         startActivity(intent);
         finish();
     }

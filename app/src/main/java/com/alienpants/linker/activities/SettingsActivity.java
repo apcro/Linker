@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import com.alienpants.linker.R;
-import com.alienpants.linker.application.NumberLink;
+import com.alienpants.linker.application.Linker;
 import com.alienpants.linker.data.LevelData;
 import com.alienpants.linker.libraries.Backend;
 import com.alienpants.linker.libraries.Utilities;
@@ -32,10 +32,10 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         Utilities.hideUI(this);
 
-        mBackend = NumberLink.getBackend();
+        mBackend = Linker.getBackend();
         mContext = this;
 
-        mLevelsBox = ((NumberLink) getApplication()).getBoxStore().boxFor(LevelData.class);
+        mLevelsBox = ((Linker) getApplication()).getBoxStore().boxFor(LevelData.class);
 
         Button reset = findViewById(R.id.buttonReset);
         reset.setOnClickListener(view -> resetAll());
@@ -47,6 +47,7 @@ public class SettingsActivity extends AppCompatActivity {
     public void resetAll() {
         resetDatabase();
         resetLevels();
+        onBackPressed();
     }
 
     public void resetDatabase() {
@@ -74,7 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
                 char first = line.charAt(0);
                 if (first == ':') {
                     char second = line.charAt(1);
-                    // new size
+                    // new mTableSize
                     size = Character.getNumericValue(second);
                     num = 1;
                 } else {

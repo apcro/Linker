@@ -8,7 +8,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.alienpants.linker.application.NumberLink;
+import com.alienpants.linker.application.Linker;
 import com.alienpants.linker.responsemodels.BaseResponse;
 
 
@@ -26,8 +26,8 @@ public class Utilities {
     public static void sendDeviceTokenToServer() {
 
         // send device token to server and store against current userId
-        String userToken = NumberLink.getBackend().getUserToken();
-        String deviceToken = NumberLink.getBackend().getSharedPreferences("deviceToken");
+        String userToken = Linker.getBackend().getUserToken();
+        String deviceToken = Linker.getBackend().getSharedPreferences("deviceToken");
 
         if (userToken!= null) {
             ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
@@ -36,7 +36,7 @@ public class Utilities {
             call.enqueue(new Callback<BaseResponse>() {
                 @Override
                 public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
-                    NumberLink.getBackend().setSharedPreferences("deviceTokenSaved", "yes");
+                    Linker.getBackend().setSharedPreferences("deviceTokenSaved", "yes");
                 }
 
                 @Override

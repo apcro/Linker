@@ -8,7 +8,7 @@ import com.alienpants.linker.libraries.Backend;
 
 import io.objectbox.BoxStore;
 
-public class NumberLink extends Application  {
+public class Linker extends Application  {
 
     public static final String preferencesFileName = "TakeMeAwayPreferences";
     public static final String MAINFONT = "fonts/Muli-Regular.ttf";
@@ -33,11 +33,11 @@ public class NumberLink extends Application  {
 
         mBackend = new Backend(this);
 
-        boxStore = MyObjectBox.builder().androidContext(NumberLink.this).build();
+        boxStore = MyObjectBox.builder().androidContext(Linker.this).build();
 
     }
 
-    public NumberLink() {
+    public Linker() {
         super();
     }
 

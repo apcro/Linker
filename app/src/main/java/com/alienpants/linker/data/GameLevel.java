@@ -75,37 +75,37 @@ public class GameLevel {
             case '8':
                 return  R.color.BlueViolet;
             case '9':
-                return  R.color.Red;
+                return  R.color.BurlyWood;
             case 'a':
-                return  R.color.Red;
+                return  R.color.Fuchsia;
             case 'b':
-                return  R.color.Red;
+                return  R.color.DarkGreen;
             case 'c':
-                return  R.color.Red;
+                return  R.color.Honeydew;
             case 'd':
-                return  R.color.Red;
+                return  R.color.LawnGreen;
             case 'e':
-                return  R.color.Red;
+                return  R.color.CadetBlue;
             case 'f':
-                return  R.color.Red;
+                return  R.color.DarkSeaGreen;
             case 'g':
-                return  R.color.Red;
+                return  R.color.PaleVioletRed;
             case 'h':
-                return  R.color.Red;
+                return  R.color.DeepSkyBlue;
             case 'i':
-                return  R.color.Red;
+                return  R.color.Moccasin;
             case 'j':
-                return  R.color.Red;
+                return  R.color.Thistle;
             case 'k':
-                return  R.color.Red;
+                return  R.color.Silver;
             case 'l':
-                return  R.color.Red;
+                return  R.color.Navy;
             case 'm':
-                return  R.color.Red;
+                return  R.color.Yellow;
             case 'n':
-                return  R.color.Red;
+                return  R.color.Plum;
             case 'o':
-                return  R.color.Red;
+                return  R.color.LightPink;
             case 'p':
                 return  R.color.Red;
             case 'q':

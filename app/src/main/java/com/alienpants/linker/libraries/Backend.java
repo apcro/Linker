@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
-import com.alienpants.linker.application.NumberLink;
+import com.alienpants.linker.application.Linker;
 
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -36,7 +36,7 @@ public class Backend {
     private static String baseUrl = "http://dev.takemeaway/api/1.0/";
 
 
-    private NumberLink application;
+    private Linker application;
 
     private static final String IS_FIRST_TIME_LAUNCH = "IsFirstTimeLaunch";
 
@@ -44,16 +44,16 @@ public class Backend {
     public final String USER_TWITTER = "twitter";
     public final String USER_FACEBOOK = "facebook";
 
-    public Backend(NumberLink application) {
+    public Backend(Linker application) {
         this.application = application;
     }
 
-    public NumberLink getApplication() {
+    public Linker getApplication() {
         return application;
     }
 
     public String getSharedPreferences(String key) {
-        SharedPreferences preferences = getApplication().getSharedPreferences(NumberLink.preferencesFileName, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getApplication().getSharedPreferences(Linker.preferencesFileName, Context.MODE_PRIVATE);
         if (preferences.contains(key)) {
             return preferences.getString(key, null);
         }
@@ -61,14 +61,14 @@ public class Backend {
     }
 
     public void setSharedPreferences(String key, String value) {
-        SharedPreferences preferences = getApplication().getSharedPreferences(NumberLink.preferencesFileName, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getApplication().getSharedPreferences(Linker.preferencesFileName, Context.MODE_PRIVATE);
         Editor editor = preferences.edit();
         editor.putString(key, value);
         editor.apply();
     }
 
     private void clearAllSharedPreferences() {
-        SharedPreferences preferences = getApplication().getSharedPreferences(NumberLink.preferencesFileName, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getApplication().getSharedPreferences(Linker.preferencesFileName, Context.MODE_PRIVATE);
         Editor editor = preferences.edit();
         editor.clear();
 
@@ -197,12 +197,12 @@ public class Backend {
     }
 
     public boolean isFirstTimeLaunch() {
-        SharedPreferences preferences = getApplication().getSharedPreferences(NumberLink.preferencesFileName, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getApplication().getSharedPreferences(Linker.preferencesFileName, Context.MODE_PRIVATE);
         return preferences.getBoolean(IS_FIRST_TIME_LAUNCH, true);
     }
 
     public void setFirstTimeLaunch(boolean isFirstTime) {
-        SharedPreferences preferences = getApplication().getSharedPreferences(NumberLink.preferencesFileName, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getApplication().getSharedPreferences(Linker.preferencesFileName, Context.MODE_PRIVATE);
         Editor preferencesEditor = preferences.edit();
         preferencesEditor.putBoolean(IS_FIRST_TIME_LAUNCH, isFirstTime);
         preferencesEditor.apply();
