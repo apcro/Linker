@@ -24,7 +24,7 @@ public class Backend {
     private static final String USER_TOKEN_PREFERENCES_KEY = "userToken";
     private static final String DEVICE_TOKEN_PREFERENCES_KEY = "deviceToken";
     private static final String HAS_SEEN_TUTORIAL_PREFERENCES_KEY = "hasSeenTutorial";
-
+//
     private static final String HASH_ALGORITHM = "HmacSHA256";
     private static String privateKey = "ven44p9wt8q3-lj4gb3q-2gbhw24p";
     private static String publicKey = "gl4n51shq45n-yghq234-89asit43";
@@ -32,17 +32,17 @@ public class Backend {
 
 
 
-//    private static String baseUrl = "https://api.takemeaway.io/api/1.0/";
-    private static String baseUrl = "http://dev.takemeaway/api/1.0/";
+    private static String baseUrl = "https://api.alienpants.com/api/1.0/";
+//    private static String baseUrl = "http://dev.takemeaway/api/1.0/";
 
 
     private Linker application;
 
     private static final String IS_FIRST_TIME_LAUNCH = "IsFirstTimeLaunch";
 
-    private static final String USER_NORMAL = "normal";
-    public final String USER_TWITTER = "twitter";
-    public final String USER_FACEBOOK = "facebook";
+//    private static final String USER_NORMAL = "normal";
+//    public final String USER_TWITTER = "twitter";
+//    public final String USER_FACEBOOK = "facebook";
 
     public Backend(Linker application) {
         this.application = application;
@@ -189,11 +189,6 @@ public class Backend {
 
     static String getBaseUrl() {
         return baseUrl;
-    }
-
-    public String CurrencySymbol() {
-        Currency currency = Currency.getInstance(Locale.getDefault());
-        return currency.getSymbol();
     }
 
     public boolean isFirstTimeLaunch() {

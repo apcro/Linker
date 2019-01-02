@@ -2,4 +2,12 @@
     <string name="app_name">Linker</string>
     <string name="title_activity_levels">Levels</string>
     <string name="boardSize">%dx%d</string>
+    <string name="levelNumber">Level: %d</string>
+    <string name="linesCount">Lines: %d</string>
+    <string name="bestCount">Best: %d</string>
+    <string name="moveCount">Moves: %d</string>
+    <string name="levelSizeText">%dx%d Levels</string>
+    <string name="aboutMessage">(C) 2018 AlienPants Ltd\n\nwww.alienpants.com</string>
+    <string name="aboutTitle">About Linker</string>
+    <string name="oKText">OK</string>
 </resources>

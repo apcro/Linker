@@ -1,6 +1,7 @@
 package com.alienpants.linker.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Button;
 
@@ -17,6 +18,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import io.objectbox.Box;
 
@@ -42,6 +44,21 @@ public class SettingsActivity extends AppCompatActivity {
 
         Button back = findViewById(R.id.button_back);
         back.setOnClickListener(view -> onBackPressed());
+
+        Button about = findViewById(R.id.buttonAbout);
+        about.setOnClickListener(v -> {
+
+            new AlertDialog.Builder(mContext)
+                    .setTitle(getString(R.string.aboutTitle))
+                    .setMessage(getString(R.string.aboutMessage))
+                    .setCancelable(false)
+                    .setPositiveButton(getString(R.string.oKText), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+        });
     }
 
     public void resetAll() {

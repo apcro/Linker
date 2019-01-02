@@ -9,9 +9,6 @@ import android.view.View;
 
 import com.alienpants.linker.R;
 
-/**
- * Created by Najib on 08/02/2016.
- */
 public class Cell extends View {
 
     // Shape of the cell, Circle for the points to be connected
@@ -35,17 +32,8 @@ public class Cell extends View {
         None
     }
 
-    // Type of cell, First: first clicked
-    public enum CellType {
-        First,
-        Second,
-        None
-    }
-
-
     // Attributes of the cell
     private CellShape cellShape;
-    private CellType type;
     private int color;
     private int indexRow;
     private int indexCol;
@@ -57,7 +45,6 @@ public class Cell extends View {
     public Cell(Context context) {
         super(context);
         this.cellShape = CellShape.Circle;
-        this.type = CellType.None;
         this.color = Color.BLACK;
         this.indexRow = 0;
         this.indexCol = 0;
@@ -74,10 +61,9 @@ public class Cell extends View {
 
 
     // Constructor by Parameters
-    public Cell(Context context, CellShape cellShape, CellType type, int color, int indexRow, int indexCol, boolean used) {
+    public Cell(Context context, CellShape cellShape, int color, int indexRow, int indexCol, boolean used) {
         super(context);
         this.cellShape = cellShape;
-        this.type = type;
         this.color = color;
         this.indexRow = indexRow;
         this.indexCol = indexCol;
@@ -96,7 +82,6 @@ public class Cell extends View {
     public Cell(Context context, Cell cell) {
         super(context);
         this.cellShape = cell.cellShape;
-        this.type = cell.getType();
         this.color = cell.color;
         this.indexRow = cell.indexRow;
         this.indexCol = cell.indexCol;
@@ -124,29 +109,34 @@ public class Cell extends View {
         float rectTop;
         float rectRight;
         float rectBottom;
+        RectF rect;
 
         // The parameters of the circle
         float circleCX;
         float circleCY;
         float circleRadius;
 
+        // let's make some reusable sizes
+        float halfWidth = getWidth() / 2;
+        float quarterWidth = getWidth() / 4;
+
+
         switch (this.cellShape) {
             // Draw a circle
             case Circle:
                 // Initialize the circle settings
-                circleCX = (float) getWidth() / 2;
-                circleCY = (float) getHeight() / 2;
-                circleRadius = (float) getHeight() / 3;
-                canvas.drawCircle(circleCX, circleCY, circleRadius, paint);
+                circleCX = halfWidth;
+                circleCY = halfWidth;
+                canvas.drawCircle(circleCX, circleCY, (float) getHeight() / 3, paint);
                 break;
 
             // Draw a rectangle from top to bottom
             case UpDown:
                 // Initialize the parameters of the rectangle
-                rectLeft = (float) getWidth() / 4;
+                rectLeft = quarterWidth;
                 rectTop = 0;
-                rectRight = (float) getWidth() * 3 / 4;
-                rectBottom = (float) getHeight();
+                rectRight = halfWidth + quarterWidth;
+                rectBottom = halfWidth + halfWidth;
 
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
 
@@ -156,176 +146,187 @@ public class Cell extends View {
             case LeftRight:
                 // Initialize the parameters of the rectangle
                 rectLeft = 0;
-                rectTop = (float) getWidth() / 4;
-                rectRight = (float) getWidth();
-                rectBottom = (float) getHeight() * 3 / 4;
+                rectTop = quarterWidth;
+                rectRight = halfWidth + halfWidth;
+                rectBottom = halfWidth + quarterWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
                 break;
 
             // Draw a rectangle half the cell, from the left
             case LeftHalf:
                 rectLeft = 0;
-                rectTop = (float) getWidth() / 4;
-                rectRight = (float) getWidth() / 2;
-                rectBottom = (float) getHeight() * 3 / 4;
-                RectF rect = new RectF(rectLeft, rectTop, rectRight, rectBottom);
-                canvas.drawRoundRect(rect, 2, 2, paint);
+                rectTop = quarterWidth;
+                rectRight = halfWidth;
+                rectBottom = halfWidth + quarterWidth;
+                rect = new RectF(rectLeft, rectTop, rectRight, rectBottom);
+                canvas.drawRoundRect(rect, quarterWidth, quarterWidth, paint);
+                canvas.drawRect(rectLeft, rectTop, rectRight-quarterWidth, rectBottom, paint);
                 break;
 
             case LeftDown:
                 // Initialize the parameters of the 1st rectangle
                 rectLeft = 0;
-                rectTop = (float) getWidth() / 4;
-                rectRight = (float) getWidth() / 2;
-                rectBottom = (float) getHeight() * 3 / 4;
+                rectTop = quarterWidth;
+                rectRight = halfWidth;
+                rectBottom = halfWidth + quarterWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
 
 
                 // Initialize the parameters of the 2nd rectangle
-                rectLeft = (float) getWidth() / 4;
-                rectTop = (float) getHeight() / 4;
-                rectRight = (float) getWidth() * 3 / 4;
-                rectBottom = (float) getHeight();
+                rectLeft = quarterWidth;
+                rectTop = halfWidth;
+                rectRight = halfWidth + quarterWidth;
+                rectBottom = halfWidth + halfWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
+
+                canvas.drawCircle(halfWidth, halfWidth, quarterWidth, paint);
                 break;
 
             case DownHalf:
-                rectLeft = (float) getWidth() / 4;
-                rectTop = (float) getHeight() / 4;
-                rectRight = (float) getWidth() * 3 / 4;
-                rectBottom = (float) getHeight();
-                canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
+                rectLeft = quarterWidth;
+                rectTop = quarterWidth;
+                rectRight = halfWidth + quarterWidth;
+                rectBottom = halfWidth + halfWidth;
+                rect = new RectF(rectLeft, rectTop, rectRight, rectBottom);
+                canvas.drawRoundRect(rect, quarterWidth, quarterWidth, paint);
+                canvas.drawRect(rectLeft, rectTop+quarterWidth, rectRight, rectBottom, paint);
                 break;
 
             case LeftUp:
                 // Initialize the parameters of the 1st rectangle
                 rectLeft = 0;
-                rectTop = (float) getWidth() / 4;
-                rectRight = (float) getWidth() / 2;
-                rectBottom = (float) getHeight() * 3 / 4;
+                rectTop = quarterWidth;
+                rectRight = halfWidth;
+                rectBottom = halfWidth + quarterWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
 
                 // Initialize the parameters of the 2nd rectangle
-                rectLeft = (float) getWidth() / 4;
+                rectLeft = quarterWidth;
                 rectTop = 0;
-                rectRight = (float) getWidth() * 3 / 4;
-                rectBottom = (float) getHeight() * 3 / 4;
+                rectRight = halfWidth + quarterWidth;
+                rectBottom = halfWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
+
+                canvas.drawCircle(halfWidth, halfWidth, quarterWidth, paint);
                 break;
 
             case UpHalf:
-                rectLeft = (float) getWidth() / 4;
+                rectLeft = quarterWidth;
                 rectTop = 0;
-                rectRight = (float) getWidth() * 3 / 4;
-                rectBottom = (float) getHeight() * 3 / 4;
-                canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
+                rectRight = halfWidth + quarterWidth;
+                rectBottom = halfWidth + quarterWidth;
+                rect = new RectF(rectLeft, rectTop, rectRight, rectBottom);
+                canvas.drawRoundRect(rect, quarterWidth, quarterWidth, paint);
+                canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom-quarterWidth, paint);
                 break;
 
             case RightDown:
                 // Initialize the parameters of the 1st rectangle
-                rectLeft = (float) getWidth() / 2;
-                rectTop = (float) getWidth() / 4;
-                rectRight = (float) getWidth();
-                rectBottom = (float) getHeight() * 3 / 4;
+                rectLeft = halfWidth;
+                rectTop = quarterWidth;
+                rectRight = halfWidth + halfWidth;
+                rectBottom = halfWidth + quarterWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
 
                 // Initialize the parameters of the 2nd rectangle
-                rectLeft = (float) getWidth() / 4;
-                rectTop = (float) getHeight() / 4;
-                rectRight = (float) getWidth() * 3 / 4;
-                rectBottom = (float) getHeight();
+                rectLeft = quarterWidth;
+                rectTop = halfWidth;
+                rectRight = halfWidth + quarterWidth;
+                rectBottom = halfWidth + halfWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
+
+                canvas.drawCircle(halfWidth, halfWidth, quarterWidth, paint);
                 break;
 
             case RightUp:
                 // Initialize the parameters of the 1st rectangle
-                rectLeft = (float) getWidth() / 2;
-                rectTop = (float) getWidth() / 4;
-                rectRight = (float) getWidth();
-                rectBottom = (float) getHeight() * 3 / 4;
+                rectLeft = halfWidth;
+                rectTop = quarterWidth;
+                rectRight = halfWidth + halfWidth;
+                rectBottom = halfWidth + quarterWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
 
                 // Initialize the parameters of the 2nd rectangle
-                rectLeft = (float) getWidth() / 4;
+                rectLeft = quarterWidth;
                 rectTop = 0;
-                rectRight = (float) getWidth() * 3 / 4;
-                rectBottom = (float) getHeight() * 3 / 4;
+                rectRight = halfWidth + quarterWidth;
+                rectBottom = halfWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
+
+                canvas.drawCircle(halfWidth, halfWidth, quarterWidth, paint);
                 break;
 
             case RightHalf:
-                rectLeft = (float) getWidth() / 2;
-                rectTop = (float) getWidth() / 4;
-                rectRight = (float) getWidth();
-                rectBottom = (float) getHeight() * 3 / 4;
-                canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
+                rectLeft = halfWidth;
+                rectTop = quarterWidth;
+                rectRight = halfWidth + halfWidth;
+                rectBottom = halfWidth + quarterWidth;
+                rect = new RectF(rectLeft, rectTop, rectRight, rectBottom);
+                canvas.drawRoundRect(rect, quarterWidth, quarterWidth, paint);
+                canvas.drawRect(rectLeft+quarterWidth, rectTop, rectRight, rectBottom, paint);
                 break;
 
             // Draw a rectangle for corner from left to top
             case CircleRight:
                 // Initialize the circle settings
-                circleCX = (float) getWidth() / 2;
-                circleCY = (float) getHeight() / 2;
-                circleRadius = (float) getHeight() / 3;
-                canvas.drawCircle(circleCX, circleCY, circleRadius, paint);
+                circleCX = halfWidth;
+                circleCY = halfWidth;
+                canvas.drawCircle(circleCX, circleCY, (float) getHeight() / 3, paint);
 
                 // Initialize the parameters of the 2nd rectangle
-                rectLeft = (float) getWidth() / 2;
-                rectTop = (float) getWidth() / 4;
-                rectRight = (float) getWidth();
-                rectBottom = (float) getHeight() * 3 / 4;
+                rectLeft = halfWidth;
+                rectTop = quarterWidth;
+                rectRight = halfWidth + halfWidth;
+                rectBottom = halfWidth + quarterWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
                 break;
 
             case  CircleUp:
                 // Initialize the circle settings
-                circleCX = (float) getWidth() / 2;
-                circleCY = (float) getHeight() / 2;
-                circleRadius = (float) getHeight() / 3;
-                canvas.drawCircle(circleCX, circleCY, circleRadius, paint);
+                circleCX = halfWidth;
+                circleCY = halfWidth;
+                canvas.drawCircle(circleCX, circleCY, (float) getHeight() / 3, paint);
 
                 // Initialize the parameters of the 2nd rectangle
-                rectLeft = (float) getWidth() / 4;
+                rectLeft = quarterWidth;
                 rectTop = 0;
-                rectRight = (float) getWidth() * 3 / 4;
-                rectBottom = (float) getHeight() / 2;
+                rectRight = halfWidth + quarterWidth;
+                rectBottom = halfWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
                 break;
 
             case  CircleLeft:
                 // Initialize the circle settings
-                circleCX = (float) getWidth() / 2;
-                circleCY = (float) getHeight() / 2;
-                circleRadius = (float) getHeight() / 3;
-                canvas.drawCircle(circleCX, circleCY, circleRadius, paint);
+                circleCX = halfWidth;
+                circleCY = halfWidth;
+                canvas.drawCircle(circleCX, circleCY, (float) getHeight() / 3, paint);
 
                 // Initialize the parameters of the 2nd rectangle
                 rectLeft = 0;
-                rectTop = (float) getWidth() / 4;
-                rectRight = (float) getWidth() / 2;
-                rectBottom = (float) getHeight() * 3 / 4;
+                rectTop = quarterWidth;
+                rectRight = halfWidth;
+                rectBottom = halfWidth + quarterWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
                 break;
 
             case  CircleDown:
                 // Initialize the circle settings
-                circleCX = (float) getWidth() / 2;
-                circleCY = (float) getHeight() / 2;
-                circleRadius = (float) getHeight() / 3;
-                canvas.drawCircle(circleCX, circleCY, circleRadius, paint);
+                circleCX = halfWidth;
+                circleCY = halfWidth;
+                canvas.drawCircle(circleCX, circleCY, (float) getHeight() / 3, paint);
 
                 // Initialize the parameters of the 2nd rectangle
-                rectLeft = (float) getWidth() / 4;
-                rectTop = (float) getHeight() / 2;
-                rectRight = (float) getWidth() * 3 / 4;
-                rectBottom = (float) getHeight();
+                rectLeft = quarterWidth;
+                rectTop = halfWidth;
+                rectRight = halfWidth + quarterWidth;
+                rectBottom = halfWidth + halfWidth;
                 canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
 
                 break;
 
             default:
                 paint.setColor(Color.TRANSPARENT);
-                canvas.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 3, paint);
+                canvas.drawCircle(halfWidth, halfWidth, getHeight() / 3, paint);
         }
 
     }
@@ -354,20 +355,11 @@ public class Cell extends View {
         this.cellShape = cellShape;
     }
 
-
-    public CellType getType() {
-        return type;
-    }
-
-    public void setType(CellType type) {
-        this.type = type;
-    }
-
-    public int getColor() {
+    public int getColour() {
         return color;
     }
 
-    public void setColor(int color) {
+    public void setColour(int color) {
         this.color = color;
     }
 

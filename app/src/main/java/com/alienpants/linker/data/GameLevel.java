@@ -36,10 +36,10 @@ public class GameLevel {
         for (int i = 0; i < layout.length(); i++) {
             char cell = layout.charAt(i);
             if (cell == '.') {
-                gameLayout[row][col] = new Cell(mContext, Cell.CellShape.Circle, Cell.CellType.None, Color.TRANSPARENT, row, (i % size), false);;
+                gameLayout[row][col] = new Cell(mContext, Cell.CellShape.Circle, Color.TRANSPARENT, row, (i % size), false);;
             } else {
                 int colour = getColourFromKey(layout.charAt(i));
-                gameLayout[row][col] = new Cell(mContext, Cell.CellShape.Circle, Cell.CellType.None, ContextCompat.getColor(mContext, colour), row, (i % size), true);
+                gameLayout[row][col] = new Cell(mContext, Cell.CellShape.Circle, ContextCompat.getColor(mContext, colour), row, (i % size), true);
             }
             col++;
             if (((i+1) % size) == 0) {
@@ -129,6 +129,6 @@ public class GameLevel {
             case 'z':
                 return  R.color.Red;
         }
-        return R.color.White;
+        return R.color.BrandWhite;
     }
 }

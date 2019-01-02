@@ -28,15 +28,11 @@ import java.util.List;
 
 public class LevelsActivity extends AppCompatActivity implements View.OnClickListener {
 
-    int levelCount = 12;
-    ArrayList<Cell[][]> mLevels;
-    Cell[][] mLevel;
-    ArrayList<String> mSizes;
-
     Backend mBackend;
     Context mContext;
     Box mLevelsBox;
 
+    // @TODO make this configurable via download
     public Integer[] levelSizes = {5,6,7,8,9};
 
     @Override
@@ -55,9 +51,9 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
 
         for (Integer sizeNum : levelSizes) {
             labelView = new TextView(this);
-            labelView.setText(sizeNum + "x" + sizeNum + " Levels");
-            labelView.setTypeface(ResourcesCompat.getFont(this, R.font.hvdcomicserifpro), Typeface.BOLD);
-            labelView.setTextColor(getColor(R.color.White));
+            labelView.setText(getString(R.string.levelSizeText, sizeNum, sizeNum));
+            labelView.setTypeface(ResourcesCompat.getFont(this, R.font.snowdream), Typeface.NORMAL);
+            labelView.setTextColor(getColor(R.color.BrandWhite));
             labelView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
             container.addView(labelView);
             makeButtons(sizeNum, container);
@@ -100,7 +96,7 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
             b.setLayoutParams(buttonParams);
             b.setId(i);
             b.setTag(size);
-            b.setShadowLayer(2f, 1.6f,1.6f, getColor(R.color.White));
+            b.setShadowLayer(2f, 1.6f,1.6f, getColor(R.color.BrandWhite));
             if (!isLocked(levels.get(i-1))) {
                 b.setOnClickListener(this);
             } else {

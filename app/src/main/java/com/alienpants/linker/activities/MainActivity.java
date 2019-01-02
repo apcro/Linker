@@ -11,7 +11,6 @@ import com.alienpants.linker.libraries.Utilities;
 
 public class MainActivity extends AppCompatActivity {
 
-//    int data_block = 100;
     Context mContext;
 
     @Override
@@ -21,30 +20,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mContext = this;
-
-//        try {
-//            FileInputStream fis = openFileInput("dataLevelSize.txt");
-//            InputStreamReader isr = new InputStreamReader(fis);
-//            char[] dataChar = new char[data_block];
-//            String final_data = "";
-//            int size1;
-//            try {
-//                while((size1=isr.read(dataChar))>0)
-//                {
-//                    String read_data = String.copyValueOf(dataChar, 0, size1);
-//                    final_data += read_data;
-//                    dataChar = new char[data_block];
-//
-//                }
-//                //Toast.makeText(getBaseContext(),"Contenu: " + final_data, Toast.LENGTH_LONG).show();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
 
         Button play = findViewById(R.id.buttonPlay);
         play.setOnClickListener(v -> {
@@ -64,4 +39,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Utilities.hideUI(this);
+    }
 }

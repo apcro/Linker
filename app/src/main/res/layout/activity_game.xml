@@ -52,12 +52,11 @@
             android:layout_marginEnd="20dp"
             android:layout_toLeftOf="@+id/buttonExit"
             android:layout_weight="1"
-            android:alpha="0.7"
             android:fontFamily="@font/hvdcomicserifpro"
             android:gravity="center_vertical|center_horizontal"
             android:text="0x0"
             android:textColor="@color/BrandYellow"
-            android:textSize="24sp" />
+            android:textSize="28sp" />
 
         <Button
             android:id="@+id/buttonExit"
@@ -151,6 +150,7 @@
             android:orientation="horizontal"
             android:padding="5dp"
             android:screenOrientation="portrait"
+            android:visibility="gone"
             android:weightSum="1">
 
             <ImageView

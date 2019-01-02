@@ -7,14 +7,13 @@
     android:layout_centerHorizontal="false"
     android:background="@android:color/transparent"
     android:gravity="center_horizontal"
-    android:orientation="vertical"
-    android:padding="10dp">
-
+    android:orientation="vertical">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="300dp"
         android:layout_height="180dp"
-        android:layout_marginTop="23dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
         android:background="@drawable/dialog_frame"
         android:orientation="vertical"
         android:padding="10dp">
@@ -45,29 +44,74 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btn_no"
-                android:layout_width="100dp"
+                android:id="@+id/btn_list"
+                android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_margin="5dp"
-                android:background="@drawable/button_outline"
+                android:background="@drawable/list_icon"
                 android:clickable="true"
-                android:fontFamily="@font/snowdream"
-                android:text="No"
+                android:textColor="@color/BrandDarkBlue"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_no"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/circle_close_icon"
+                android:clickable="true"
                 android:textColor="@color/BrandDarkBlue"
                 android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btn_yes"
-                android:layout_width="100dp"
+                android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_margin="5dp"
-                android:background="@drawable/button_outline"
+                android:background="@drawable/right_icon"
                 android:clickable="true"
                 android:fontFamily="@font/snowdream"
-                android:text="Yes"
                 android:textColor="@color/BrandDarkBlue"
                 android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentTop="true">
+
+
+        <ImageView
+            android:id="@+id/starOne"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_toLeftOf="@+id/starTwo"
+            android:rotation="-20"
+            android:src="@drawable/star_off" />
+
+        <ImageView
+            android:id="@+id/starTwo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="false"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/star_off" />
+
+        <ImageView
+            android:id="@+id/starThree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@+id/starTwo"
+            android:rotation="20"
+            android:src="@drawable/star_off" />
+    </RelativeLayout>
 </RelativeLayout>

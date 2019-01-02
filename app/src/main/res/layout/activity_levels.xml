@@ -16,6 +16,7 @@
         android:layout_height="40dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:elevation="1dp"
         android:orientation="horizontal">
 
@@ -36,13 +37,14 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/topBar">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/topBar"
+        android:layout_marginTop="10dp">
 
         <LinearLayout
             android:id="@+id/layoutHolder"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:gravity="center_horizontal"

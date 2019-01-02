@@ -145,6 +145,7 @@
     <color name="Black">#000000</color>
 
     <color name="BrandLightBlue">#c8dcee</color>
-    <color name="BrandDarkBlue">#1e2030</color>
+    <color name="BrandDarkBlue">#2c3f52</color>
     <color name="BrandYellow">#cf981a</color>
+    <color name="BrandWhite">#d5f2ee</color>
 </resources>
