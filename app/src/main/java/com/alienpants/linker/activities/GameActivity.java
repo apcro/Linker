@@ -46,26 +46,24 @@ public class GameActivity extends Activity {
     private static final String TAG = GameActivity.class.getSimpleName();
 
     private int SCORE_DIFFERENCE = 3;
-    LinearLayout mTableHolder;
-    TableLayout mGameTable;
-    int mGameTableWidth, mGameTableHeight;
-    int mCellWidth, mCellHeight;
+    private TableLayout mGameTable;
+    private int mGameTableWidth, mGameTableHeight;
+    private int mCellWidth, mCellHeight;
 
-    Backend mBackend;
-    Box mLevelsBox;
+    private Box mLevelsBox;
 
-    LevelData mThisLevel;
+    private LevelData mThisLevel;
 
-    int mTableSize = 7;
-    int mCurrentLevel = 1;
-    int mLevelCount;
+    private int mTableSize = 7;
+    private int mCurrentLevel = 1;
+    private int mLevelCount;
 
-    Cell[][] mTableCellsArray;
-    int mGameScore, mMoveScore, mBestScore = 0;
-    int mColourChosen;
-    int mCurrentTouchedRow, mCurrentTouchedCol;
-    Dialog mExitAlert;
-    Dialog mWinAlert;
+    private Cell[][] mTableCellsArray;
+    private int mGameScore, mMoveScore, mBestScore = 0;
+    private int mColourChosen;
+    private int mCurrentTouchedRow, mCurrentTouchedCol;
+    private Dialog mExitAlert;
+    private Dialog mWinAlert;
 
     Context mContext;
 
@@ -94,7 +92,6 @@ public class GameActivity extends Activity {
 
         mContext = this;
 
-        mBackend = Linker.getBackend();
         mLevelsBox = ((Linker) getApplication()).getBoxStore().boxFor(LevelData.class);
 
         mTableSize = Objects.requireNonNull(this.getIntent().getExtras()).getInt("mTableSize");
@@ -113,7 +110,7 @@ public class GameActivity extends Activity {
         mBestScore = mThisLevel.getBestScore();
 
         mGameTable = findViewById(R.id.table_game);
-        mTableHolder = findViewById(R.id.tableHolder);
+        LinearLayout mTableHolder = findViewById(R.id.tableHolder);
 
         mGameTableWidth = 0;
         mGameTableHeight = 0;
@@ -226,8 +223,8 @@ public class GameActivity extends Activity {
                 int touchedTableCol = (int) motionEvent.getX() / mCellHeight;
 
                 // Check that the touchedTableRow and touchedTableCol will not exceed the limits
-                touchedTableRow = touchedTableRow > (mTableSize - 1) ? (mTableSize - 1) : touchedTableRow;
-                touchedTableCol = touchedTableCol > (mTableSize - 1) ? (mTableSize - 1) : touchedTableCol;
+                touchedTableRow = Math.min(touchedTableRow, (mTableSize - 1));
+                touchedTableCol = Math.min(touchedTableCol, (mTableSize - 1));
 
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
 
@@ -240,18 +237,16 @@ public class GameActivity extends Activity {
                     // is it a circle?
                     Cell.CellShape thisCell = mTableCellsArray[touchedTableRow][touchedTableCol].getCellShape();
 
-                    switch (thisCell) {
-                        case Circle:
-                            canDraw = true;
+                    if (thisCell == Cell.CellShape.Circle) {
+                        canDraw = true;
 
-                            mColourChosen = mTableCellsArray[touchedTableRow][touchedTableCol].getColour();
+                        mColourChosen = mTableCellsArray[touchedTableRow][touchedTableCol].getColour();
 
-                            // show touch circle
-                            showTouchCircle(motionEvent.getRawX(), motionEvent.getRawY());
+                        // show touch circle
+                        showTouchCircle(motionEvent.getRawX(), motionEvent.getRawY());
 
-                            // @TODO find second circle and embiggen
-                            embiggen(touchedTableRow, touchedTableCol, mColourChosen);
-                            break;
+                        // @TODO find second circle and embiggen
+//                        embiggen(touchedTableRow, touchedTableCol, mColourChosen);
                     }
 
                     return true;
@@ -453,18 +448,6 @@ public class GameActivity extends Activity {
                                     if (thisCellColour == mColourChosen && thisCellShape == Cell.CellShape.Circle) {
 
                                         Log.d(TAG, "Last circle");
-
-//                                        if (lastCellShape == Cell.CellShape.Circle) {
-//                                            if (touchedTableRow > lastTouchedRow) {
-//                                                mTableCellsArray[lastTouchedRow][lastTouchedCol].setCellShape(Cell.CellShape.CircleDown);
-//                                            } else if (touchedTableRow < lastTouchedRow) {
-//                                                mTableCellsArray[lastTouchedRow][lastTouchedCol].setCellShape(Cell.CellShape.CircleUp);
-//                                            } else if (touchedTableCol > lastTouchedCol) {
-//                                                mTableCellsArray[lastTouchedRow][lastTouchedCol].setCellShape(Cell.CellShape.CircleRight);
-//                                            } else {
-//                                                mTableCellsArray[lastTouchedRow][lastTouchedCol].setCellShape(Cell.CellShape.CircleLeft);
-//                                            }
-//                                        }
 
                                     } else if (lastCellColour == mColourChosen && thisCellColour == TRANSPARENT) {
                                         Log.d(TAG, "Valid cell chosen");

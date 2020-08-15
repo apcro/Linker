@@ -7,7 +7,7 @@
     <string name="bestCount">Best: %d</string>
     <string name="moveCount">Moves: %d</string>
     <string name="levelSizeText">%dx%d Levels</string>
-    <string name="aboutMessage">(C) 2018 AlienPants Ltd\n\nwww.alienpants.com</string>
+    <string name="aboutMessage">(C) 2018-now AlienPants Ltd\n\nwww.alienpants.com</string>
     <string name="aboutTitle">About Linker</string>
     <string name="oKText">OK</string>
 </resources>

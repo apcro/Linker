@@ -1,5 +1,7 @@
 package com.alienpants.linker.activities;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -18,15 +20,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import io.objectbox.Box;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends Activity {
 
-    Backend mBackend;
-    Context mContext;
-    Box mLevelsBox;
+    private Context mContext;
+    private Box mLevelsBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         Utilities.hideUI(this);
 
-        mBackend = Linker.getBackend();
+        Backend mBackend = Linker.getBackend();
         mContext = this;
 
         mLevelsBox = ((Linker) getApplication()).getBoxStore().boxFor(LevelData.class);

@@ -1,10 +1,10 @@
 package com.alienpants.linker.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import io.objectbox.Box;
 
@@ -18,19 +18,15 @@ import com.alienpants.linker.R;
 import com.alienpants.linker.application.Linker;
 import com.alienpants.linker.data.LevelData;
 import com.alienpants.linker.data.LevelData_;
-import com.alienpants.linker.libraries.Backend;
 import com.alienpants.linker.libraries.Utilities;
-import com.alienpants.linker.models.Cell;
-import com.wefika.flowlayout.FlowLayout;
+import com.nex3z.flowlayout.FlowLayout;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class LevelsActivity extends AppCompatActivity implements View.OnClickListener {
+public class LevelsActivity extends Activity implements View.OnClickListener {
 
-    Backend mBackend;
-    Context mContext;
-    Box mLevelsBox;
+    private Context mContext;
+    private Box mLevelsBox;
 
     // @TODO make this configurable via download
     public Integer[] levelSizes = {5,6,7,8,9};
@@ -41,7 +37,6 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_levels);
         Utilities.hideUI(this);
 
-        mBackend = Linker.getBackend();
         mContext = this;
         mLevelsBox = ((Linker) getApplication()).getBoxStore().boxFor(LevelData.class);
 
@@ -81,7 +76,7 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
         FlowLayout levelsButtonLayout = new FlowLayout(this);
 
         FlowLayout.LayoutParams buttonParams = new FlowLayout.LayoutParams(250, 250);
-        buttonParams.setMargins(dpAsPixels, dpAsPixels, dpAsPixels, dpAsPixels);
+//        buttonParams.setMargins(dpAsPixels, dpAsPixels, dpAsPixels, dpAsPixels);
 
         for(int i = 1 ; i <= numLevels ; i++) {
             Button b = new Button(this);
@@ -107,7 +102,7 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
 
         }
 
-        layoutParams.setMargins(dpAsPixels, dpAsPixels, dpAsPixels, dpAsPixels);
+//        layoutParams.setMargins(dpAsPixels, dpAsPixels, dpAsPixels, dpAsPixels);
         levelsButtonLayout.setLayoutParams(layoutParams);
         container.addView(levelsButtonLayout);
 

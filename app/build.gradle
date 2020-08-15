@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.objectbox'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId 'com.alienpants.linker'
         minSdkVersion 25
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 29
+        versionCode 2
+        versionName "1.1"
     }
     buildTypes {
         release {
@@ -24,24 +24,15 @@ android {
     }
 }
 
+configurations {
+    cleanedAnnotations
+    compile.exclude group: 'org.jetbrains' , module:'annotations'
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
-    implementation 'com.google.android.material:material:1.1.0-alpha02'
-    //Android support libraries
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.android.material:material:1.0.0'
-    // need to override these versions
-    implementation 'androidx.core:core:1.0.1'
-    // retrofit, gson
-    implementation 'com.google.code.gson:gson:2.8.2'
-    implementation 'com.squareup.retrofit2:retrofit:2.1.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
-    // logging
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
-    implementation 'com.jakewharton:butterknife:9.0.0-rc1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0-rc1'
-    implementation 'com.daasuu:EasingInterpolator:1.0.0'
+    implementation 'com.google.android.material:material:1.2.0'
     // levels layout
-    implementation 'com.wefika:flowlayout:0.4.1'
+//    implementation 'com.wefika:flowlayout:0.4.1'
+    implementation 'com.nex3z:flow-layout:1.3.1'
 }

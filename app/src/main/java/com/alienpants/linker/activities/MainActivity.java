@@ -1,15 +1,15 @@
 package com.alienpants.linker.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
 
 import com.alienpants.linker.R;
 import com.alienpants.linker.libraries.Utilities;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     Context mContext;
 

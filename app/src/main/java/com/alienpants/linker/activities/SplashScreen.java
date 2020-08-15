@@ -24,7 +24,7 @@ public class SplashScreen extends Activity {
 
 //    private static final String TAG = SplashScreen.class.getSimpleName();
 
-    Box mLevelsBox;
+    private Box mLevelsBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -16,15 +16,11 @@ public class GameLevel {
 
 
     private Context mContext;
-    private String levelName;
-    private int levelNumber;
     private int size;
 
     private Cell[][] gameLayout;
 
     public GameLevel(Context context, String levelName, int levelNumber, int size) {
-        this.levelName = levelName;
-        this.levelNumber = levelNumber;
         this.gameLayout = new Cell[size][size];
         this.size = size;
         this.mContext = context;
