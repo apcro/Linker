@@ -15,11 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alienpants.linker.R;
+import com.alienpants.linker.views.wefikaFlowLayout;
 import com.alienpants.linker.application.Linker;
 import com.alienpants.linker.data.LevelData;
 import com.alienpants.linker.data.LevelData_;
 import com.alienpants.linker.libraries.Utilities;
-import com.nex3z.flowlayout.FlowLayout;
 
 import java.util.List;
 
@@ -68,15 +68,15 @@ public class LevelsActivity extends Activity implements View.OnClickListener {
         float scale = getResources().getDisplayMetrics().density;
         int dpAsPixels = (int) (2 * scale + 0.5f);
 
-        FlowLayout.LayoutParams layoutParams = new FlowLayout.LayoutParams(
-                FlowLayout.LayoutParams.WRAP_CONTENT,
-                FlowLayout.LayoutParams.WRAP_CONTENT
+        wefikaFlowLayout.LayoutParams layoutParams = new wefikaFlowLayout.LayoutParams(
+                wefikaFlowLayout.LayoutParams.WRAP_CONTENT,
+                wefikaFlowLayout.LayoutParams.WRAP_CONTENT
         );
 
-        FlowLayout levelsButtonLayout = new FlowLayout(this);
+        wefikaFlowLayout levelsButtonLayout = new wefikaFlowLayout(this);
 
-        FlowLayout.LayoutParams buttonParams = new FlowLayout.LayoutParams(250, 250);
-//        buttonParams.setMargins(dpAsPixels, dpAsPixels, dpAsPixels, dpAsPixels);
+        wefikaFlowLayout.LayoutParams buttonParams = new wefikaFlowLayout.LayoutParams(250, 250);
+        buttonParams.setMargins(dpAsPixels, dpAsPixels, dpAsPixels, dpAsPixels);
 
         for(int i = 1 ; i <= numLevels ; i++) {
             Button b = new Button(this);
@@ -102,7 +102,7 @@ public class LevelsActivity extends Activity implements View.OnClickListener {
 
         }
 
-//        layoutParams.setMargins(dpAsPixels, dpAsPixels, dpAsPixels, dpAsPixels);
+        layoutParams.setMargins(dpAsPixels, dpAsPixels, dpAsPixels, dpAsPixels);
         levelsButtonLayout.setLayoutParams(layoutParams);
         container.addView(levelsButtonLayout);
 
